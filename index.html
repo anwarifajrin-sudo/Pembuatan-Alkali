@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#059669">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>DompetKu Pro — Manajemen Keuangan Pribadi</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .sembunyi-scroll::-webkit-scrollbar { display: none; }
+    .sembunyi-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-24 selection:bg-emerald-500 selection:text-white">
+
+  <header class="sticky top-0 z-30 bg-slate-900/90 backdrop-blur border-b border-slate-800 px-4 py-3">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-600 flex items-center justify-center font-black text-lg text-white shadow">Rp</div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-base sm:text-lg tracking-tight">DompetKu Pro</h1>
+            <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Siap Pasang</span>
+          </div>
+          <p class="text-xs text-slate-400">Manajemen Keuangan &amp; Anggaran Harian</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <button id="btnPasangHp" type="button" class="px-2.5 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-medium">
+          Pasang di HP
+        </button>
+        <button id="btnSembunyiSaldo" type="button" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">
+          Privasi
+        </button>
+        <button id="btnDataCadangan" type="button" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium">
+          Cadangkan
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 pt-4 space-y-5">
+
+    <section class="rounded-3xl bg-gradient-to-br from-emerald-800 via-teal-900 to-slate-900 p-5 border border-emerald-600/30 shadow-xl">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs uppercase tracking-wider text-emerald-200/80 font-semibold">Total Kekayaan Bersih</span>
+          <div id="teksKekayaanBersih" class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Rp 0</div>
+          <p id="teksRingkasanBulan" class="text-xs text-emerald-200/90 mt-1">Memuat ringkasan bulan berjalan...</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="btnBukaModalTransaksi" type="button" class="px-4 py-2.5 rounded-xl bg-white text-emerald-950 font-bold text-xs shadow hover:bg-emerald-50 transition">
+            + Catat Transaksi
+          </button>
+          <button id="btnBukaModalTransfer" type="button" class="px-3.5 py-2.5 rounded-xl bg-emerald-950/60 text-emerald-100 border border-emerald-400/30 font-semibold text-xs hover:bg-emerald-900/70 transition">
+            Pindah Dana
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5 pt-4 border-t border-white/10">
+        <div class="bg-slate-950/40 rounded-2xl p-3 border border-white/10">
+          <span class="text-[11px] text-emerald-200/80">Pemasukan Bulan Ini</span>
+          <div id="teksTotalMasuk" class="text-sm sm:text-base font-bold text-emerald-300 mt-0.5">Rp 0</div>
+        </div>
+        <div class="bg-slate-950/40 rounded-2xl p-3 border border-white/10">
+          <span class="text-[11px] text-emerald-200/80">Pengeluaran Bulan Ini</span>
+          <div id="teksTotalKeluar" class="text-sm sm:text-base font-bold text-rose-300 mt-0.5">Rp 0</div>
+        </div>
+        <div class="bg-slate-950/40 rounded-2xl p-3 border border-white/10">
+          <span class="text-[11px] text-emerald-200/80">Selisih Kas Bersih</span>
+          <div id="teksSelisihKas" class="text-sm sm:text-base font-bold text-sky-300 mt-0.5">Rp 0</div>
+        </div>
+        <div class="bg-slate-950/40 rounded-2xl p-3 border border-white/10">
+          <span class="text-[11px] text-emerald-200/80">Rasio Tabungan</span>
+          <div id="teksRasioTabungan" class="text-sm sm:text-base font-bold text-amber-300 mt-0.5">0%</div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Daftar Dompet &amp; Rekening</h2>
+        <button id="btnTambahDompetBaru" type="button" class="text-xs font-semibold text-emerald-400 hover:text-emerald-300">+ Tambah Dompet</button>
+      </div>
+      <div id="wadahKartuDompet" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+    </section>
+
+    <nav class="flex gap-1.5 overflow-x-auto sembunyi-scroll bg-slate-900 p-1.5 rounded-2xl border border-slate-800">
+      <button type="button" data-panel="ringkasan" class="tombol-tab flex-1 py-2 px-3 rounded-xl text-xs font-bold whitespace-nowrap bg-emerald-600 text-white">Ringkasan</button>
+      <button type="button" data-panel="mutasi" class="tombol-tab flex-1 py-2 px-3 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:text-white">Riwayat Mutasi</button>
+      <button type="button" data-panel="anggaran" class="tombol-tab flex-1 py-2 px-3 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:text-white">Anggaran</button>
+      <button type="button" data-panel="impian" class="tombol-tab flex-1 py-2 px-3 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:text-white">Target Impian</button>
+      <button type="button" data-panel="tagihan" class="tombol-tab flex-1 py-2 px-3 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:text-white">Tagihan &amp; Pinjaman</button>
+      <button type="button" data-panel="simulasi" class="tombol-tab flex-1 py-2 px-3 rounded-xl text-xs font-bold whitespace-nowrap text-slate-400 hover:text-white">Kalkulator</button>
+    </nav>
+
+    <section id="panel-ringkasan" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-sm">Proporsi Pengeluaran per Kategori</h3>
+            <span class="text-xs text-slate-400">Bulan Berjalan</span>
+          </div>
+          <div id="visualDonatKategori" class="space-y-2.5"></div>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-sm">kesehatan Finansial &amp; Bantuan Cepat</h3>
+            <span id="lencanaSkorSehat" class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">Sehat</span>
+          </div>
+          <div id="daftarIndikatorSehat" class="space-y-3 text-xs"></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold text-sm">Transaksi Terbaru</h3>
+          <button id="btnLihatSemuaMutasi" type="button" class="text-xs text-emerald-400 hover:underline font-medium">Lihat Semua</button>
+        </div>
+        <div id="wadahMutasiTerbaru" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <section id="panel-mutasi" class="hidden space-y-4">
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+          <input id="inputCariMutasi" type="text" placeholder="Cari catatan atau kategori..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+          <select id="pilihFilterTipe" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+            <option value="SEMUA">Semua Jenis</option>
+            <option value="MASUK">Pemasukan</option>
+            <option value="KELUAR">Pengeluaran</option>
+            <option value="TRANSFER">Pindah Dana</option>
+          </select>
+          <select id="pilihFilterDompet" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+            <option value="SEMUA">Semua Dompet</option>
+          </select>
+          <button id="btnUnduhCsv" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl px-3 py-2 text-xs font-semibold">
+            Unduh Laporan CSV
+          </button>
+        </div>
+        <div id="infoHasilFilter" class="text-xs text-slate-400"></div>
+        <div id="wadahDaftarMutasiLengkap" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <section id="panel-anggaran" class="hidden space-y-4">
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="font-bold text-sm">Batas Anggaran Bulanan per Kategori</h3>
+            <p class="text-xs text-slate-400">Pantau batas belanja agar kas bulanan tetap aman</p>
+          </div>
+          <button id="btnBukaModalAnggaran" type="button" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">
+            + Atur Batas Anggaran
+          </button>
+        </div>
+        <div id="wadahDaftarAnggaran" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      </div>
+    </section>
+
+    <section id="panel-impian" class="hidden space-y-4">
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="font-bold text-sm">Target Tabungan &amp; Dana Impian</h3>
+            <p class="text-xs text-slate-400">Sisihkan saldo secara bertahap untuk kebutuhan masa depan</p>
+          </div>
+          <button id="btnBukaModalImpian" type="button" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold">
+            + Buat Target Baru
+          </button>
+        </div>
+        <div id="wadahDaftarImpian" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      </div>
+    </section>
+
+    <section id="panel-tagihan" class="hidden space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="font-bold text-sm">Jadwal Tagihan Rutin</h3>
+              <p class="text-xs text-slate-400">Kuota internet, bensin, kos, atau langganan</p>
+            </div>
+            <button id="btnBukaModalTagihan" type="button" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">+ Tagihan</button>
+          </div>
+          <div id="wadahDaftarTagihan" class="space-y-2.5"></div>
+        </div>
+
+        <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="font-bold text-sm">Catatan Pinjaman &amp; Piutang</h3>
+              <p class="text-xs text-slate-400">Rekam pinjaman teman atau cicilan berjalan</p>
+            </div>
+            <button id="btnBukaModalPinjaman" type="button" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">+ Catat</button>
+          </div>
+          <div id="wadahDaftarPinjaman" class="space-y-2.5"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="panel-simulasi" class="hidden space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3">
+          <h3 class="font-bold text-sm">Simulasi Dana Darurat &amp; Pembagi Gaji 50/30/20</h3>
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">Total Pemasukan Bulanan (Rp)</label>
+            <input id="inputGajiSimulasi" type="number" value="3200000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">Pengeluaran Pokok Rutin per Bulan (Rp)</label>
+            <input id="inputPokokSimulasi" type="number" value="1500000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+          </div>
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">Target kelipatan Dana Darurat (Bulan)</label>
+            <input id="inputBulanDarurat" type="number" value="6" min="3" max="24" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+          </div>
+          <button id="btnHitungSimulasi" type="button" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">
+            Hitung Rekomendasi Alokasi
+          </button>
+        </div>
+
+        <div id="hasilKotakSimulasi" class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3 text-xs"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="modalTransaksi" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm">Catat Transaksi Keuangan</h3>
+        <button id="btnTutupModalTransaksi" type="button" class="text-slate-400 hover:text-white text-xs font-bold">Tutup</button>
+      </div>
+      <form id="formTransaksi" class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" id="pilihTipeKeluar" class="py-2 rounded-xl font-bold bg-rose-600 text-white">Pengeluaran</button>
+          <button type="button" id="pilihTipeMasuk" class="py-2 rounded-xl font-bold bg-slate-800 text-slate-300">Pemasukan</button>
+        </div>
+        <input type="hidden" id="nilaiTipeTransaksi" value="KELUAR">
+        <div>
+          <label class="block text-slate-400 mb-1">Nominal (Rp)</label>
+          <input id="inputNominalTransaksi" type="number" required min="100" placeholder="Contoh: 25000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 mb-1">Kategori</label>
+            <select id="inputKategoriTransaksi" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"></select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Dompet</label>
+            <select id="inputDompetTransaksi" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"></select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 mb-1">Tanggal</label>
+            <input id="inputTanggalTransaksi" type="date" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Catatan Singkat</label>
+            <input id="inputCatatanTransaksi" type="text" required placeholder="Makan siang / Bensin" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+          </div>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold">Simpan Transaksi</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalTransfer" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm">Pindah Dana Antar Dompet</h3>
+        <button id="btnTutupModalTransfer" type="button" class="text-slate-400 hover:text-white text-xs font-bold">Tutup</button>
+      </div>
+      <form id="formTransfer" class="space-y-3 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 mb-1">Dari Dompet</label>
+            <select id="inputDompetAsal" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"></select>
+          </div>
+          <div>
+            <label class="block text-slate-400 mb-1">Ke Dompet</label>
+            <select id="inputDompetTujuan" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white"></select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Nominal Pindah Dana (Rp)</label>
+          <input id="inputNominalTransfer" type="number" required min="1000" placeholder="100000" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+        </div>
+        <div>
+          <label class="block text-slate-400 mb-1">Keterangan</label>
+          <input id="inputCatatanTransfer" type="text" placeholder="Top up e-wallet / Tarik tunai" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold">Proses Pindah Dana</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalUniversal" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 id="judulModalUniversal" class="font-bold text-sm">Formulir</h3>
+        <button id="btnTutupModalUniversal" type="button" class="text-slate-400 hover:text-white text-xs font-bold">Tutup</button>
+      </div>
+      <div id="isiModalUniversal" class="text-xs space-y-3"></div>
+    </div>
+  </div>
+
+  <div id="notifikasiToast" class="fixed bottom-5 right-5 z-50 hidden bg-emerald-600 text-white px-4 py-2.5 rounded-2xl shadow-lg text-xs font-semibold"></div>
+
+  <script>
+    const KUNCI_PENYIMPANAN = 'DOMPETKU_PRO_DATA_V1';
+    const KATEGORI_KELUAR = ['Makan & Minum', 'Transportasi & BBM', 'Kebutuhan Kuliah', 'Kuota & Tagihan', 'Olahraga & Hobi', 'Belanja Harian', 'Lainnya'];
+    const KATEGORI_MASUK = ['Uang Saku & Kiriman', 'Insentif PKL / Magang', 'Bonus & Proyek', 'Hasil Jualan', 'Lainnya'];
+
+    const DATA_AWAL = {
+      sembunyiSaldo: false,
+      dompet: [
+        { id: 'd1', nama: 'Dompet Tunai', jenis: 'Tunai', saldo: 450000 },
+        { id: 'd2', nama: 'Rekening Bank Utama', jenis: 'Bank', saldo: 2850000 },
+        { id: 'd3', nama: 'E-Wallet Harian', jenis: 'Digital', saldo: 375000 },
+        { id: 'd4', nama: 'Tabungan Darurat', jenis: 'Investasi', saldo: 1750000 }
+      ],
+      mutasi: [
+        { id: 'm1', tipe: 'MASUK', nominal: 1800000, kategori: 'Insentif PKL / Magang', dompetId: 'd2', tanggal: '2026-11-01', catatan: 'Uang saku bulanan & insentif magang' },
+        { id: 'm2', tipe: 'MASUK', nominal: 650000, kategori: 'Uang Saku & Kiriman', dompetId: 'd2', tanggal: '2026-11-03', catatan: 'Tambahan uang saku bulanan' },
+        { id: 'm3', tipe: 'KELUAR', nominal: 45000, kategori: 'Transportasi & BBM', dompetId: 'd1', tanggal: '2026-11-05', catatan: 'Isi bensin motor perjalanan PKL' },
+        { id: 'm4', tipe: 'KELUAR', nominal: 28000, kategori: 'Makan & Minum', dompetId: 'd3', tanggal: '2026-11-08', catatan: 'Makan siang kantin & es teh' },
+        { id: 'm5', tipe: 'KELUAR', nominal: 75000, kategori: 'Kuota & Tagihan', dompetId: 'd3', tanggal: '2026-11-10', catatan: 'Paket data internet bulanan' },
+        { id: 'm6', tipe: 'KELUAR', nominal: 40000, kategori: 'Olahraga & Hobi', dompetId: 'd1', tanggal: '2026-11-12', catatan: 'Patungan sewa lapangan bulutangkis & shuttlecock' },
+        { id: 'm7', tipe: 'KELUAR', nominal: 65000, kategori: 'Kebutuhan Kuliah', dompetId: 'd1', tanggal: '2026-11-14', catatan: 'Cetak laporan praktikum & jilid' }
+      ],
+      anggaran: [
+        { kategori: 'Makan & Minum', batas: 750000 },
+        { kategori: 'Transportasi & BBM', batas: 300000 },
+        { kategori: 'Kebutuhan Kuliah', batas: 250000 },
+        { kategori: 'Olahraga & Hobi', batas: 200000 },
+        { kategori: 'Kuota & Tagihan', batas: 150000 }
+      ],
+      impian: [
+        { id: 'i1', judul: 'Dana Cadangan Wisuda & Sertifikasi', target: 3500000, terkumpul: 1750000, tenggat: '2027-06-30' },
+        { id: 'i2', judul: 'Servis Berkala & Ban Motor Baru', target: 850000, terkumpul: 420000, tenggat: '2027-02-15' },
+        { id: 'i3', judul: 'Raket Bulutangkis Cadangan', target: 550000, terkumpul: 250000, tenggat: '2027-03-30' }
+      ],
+      tagihan: [
+        { id: 't1', nama: 'Paket Data Internet Bulanan', nominal: 75000, jatuhTempo: 'Tanggal 10', lunas: true },
+        { id: 't2', nama: 'Servis & Ganti Oli Motor Rutin', nominal: 65000, jatuhTempo: 'Tanggal 20', lunas: false },
+        { id: 't3', nama: 'Iuran Kas Bulutangkis Mingguan', nominal: 40000, jatuhTempo: 'Tanggal 25', lunas: false }
+      ],
+      pinjaman: [
+        { id: 'p1', jenis: 'PIUTANG', namaOrang: 'Rekan Kampus (Patungan Print)', nominal: 35000, tenggat: '2026-11-22', selesai: false },
+        { id: 'p2', jenis: 'HUTANG', namaOrang: 'Titip Beli Shuttlecock', nominal: 25000, tenggat: '2026-11-19', selesai: false }
+      ]
+    };
+
+    let state = muatDataLokal();
+
+    function muatDataLokal() {
+      try {
+        const mentah = localStorage.getItem(KUNCI_PENYIMPANAN);
+        if (mentah) return JSON.parse(mentah);
+      } catch (err) {
+        console.warn('Gagal membaca penyimpanan lokal:', err);
+      }
+      return JSON.parse(JSON.stringify(DATA_AWAL));
+    }
+
+    function simpanDataLokal() {
+      try {
+        localStorage.setItem(KUNCI_PENYIMPANAN, JSON.stringify(state));
+      } catch (err) {
+        console.warn('Gagal menyimpan ke penyimpanan lokal:', err);
+      }
+    }
+
+    function formatRupiah(angka) {
+      if (state.sembunyiSaldo) return 'Rp ••••••••';
+      const nilai = Number(angka) || 0;
+      return 'Rp ' + nilai.toLocaleString('id-ID');
+    }
+
+    function tampilToast(pesan) {
+      const el = document.getElementById('notifikasiToast');
+      if (!el) return;
+      el.textContent = pesan;
+      el.classList.remove('hidden');
+      setTimeout(() => { el.classList.add('hidden'); }, 2600);
+    }
+
+    function cariNamaDompet(id) {
+      const d = state.dompet.find(item => item.id === id);
+      return d ? d.nama : 'Dompet Umum';
+    }
+
+    function renderSemua() {
+      simpanDataLokal();
+      renderRingkasanAtas();
+      renderDaftarDompet();
+      renderProporsiKategori();
+      renderIndikatorSehat();
+      renderMutasiTerbaru();
+      renderMutasiLengkap();
+      renderDaftarAnggaran();
+      renderDaftarImpian();
+      renderTagihanPinjaman();
+      hitungSimulasiKeuangan();
+    }
+
+    function renderRingkasanAtas() {
+      const totalSaldo = state.dompet.reduce((acc, d) => acc + (Number(d.saldo) || 0), 0);
+      let masuk = 0;
+      let keluar = 0;
+      state.mutasi.forEach(m => {
+        if (m.tipe === 'MASUK') masuk += Number(m.nominal) || 0;
+        if (m.tipe === 'KELUAR') keluar += Number(m.nominal) || 0;
+      });
+      const selisih = masuk - keluar;
+      const rasio = masuk > 0 ? Math.max(0, Math.round((selisih / masuk) * 100)) : 0;
+
+      document.getElementById('teksKekayaanBersih').textContent = formatRupiah(totalSaldo);
+      document.getElementById('teksTotalMasuk').textContent = formatRupiah(masuk);
+      document.getElementById('teksTotalKeluar').textContent = formatRupiah(keluar);
+      document.getElementById('teksSelisihKas').textContent = (selisih >= 0 ? '+' : '-') + formatRupiah(Math.abs(selisih));
+      document.getElementById('teksRasioTabungan').textContent = rasio + '%';
+      document.getElementById('teksRingkasanBulan').textContent =
+        state.dompet.length + ' dompet aktif • ' + state.mutasi.length + ' transaksi tercatat';
+    }
+
+    function renderDaftarDompet() {
+      const wadah = document.getElementById('wadahKartuDompet');
+      wadah.innerHTML = state.dompet.map(d => `
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-slate-800 text-emerald-400">${d.jenis}</span>
+            <span class="text-[11px] text-slate-500">#${d.id}</span>
+          </div>
+          <div class="mt-2">
+            <div class="text-xs text-slate-300 font-medium truncate">${d.nama}</div>
+            <div class="text-sm font-extrabold text-white mt-0.5">${formatRupiah(d.saldo)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      const filterSelect = document.getElementById('pilihFilterDompet');
+      const nilaiLama = filterSelect.value || 'SEMUA';
+      filterSelect.innerHTML = '<option value="SEMUA">Semua Dompet</option>' +
+        state.dompet.map(d => `<option value="${d.id}">${d.nama}</option>`).join('');
+      filterSelect.value = nilaiLama;
+    }
+
+    function renderProporsiKategori() {
+      const wadah = document.getElementById('visualDonatKategori');
+      const petaKategori = {};
+      let totalKeluar = 0;
+      state.mutasi.filter(m => m.tipe === 'KELUAR').forEach(m => {
+        const nilai = Number(m.nominal) || 0;
+        petaKategori[m.kategori] = (petaKategori[m.kategori] || 0) + nilai;
+        totalKeluar += nilai;
+      });
+
+      const entri = Object.entries(petaKategori).sort((a, b) => b[1] - a[1]);
+      if (entri.length === 0) {
+        wadah.innerHTML = '<p class="text-xs text-slate-500">Belum ada pengeluaran tercatat.</p>';
+        return;
+      }
+
+      const warnaBar = ['bg-emerald-500', 'bg-sky-500', 'bg-amber-500', 'bg-rose-500', 'bg-purple-500', 'bg-teal-400'];
+      wadah.innerHTML = entri.map(([kat, nom], idx) => {
+        const persen = totalKeluar > 0 ? Math.round((nom / totalKeluar) * 100) : 0;
+        const warna = warnaBar[idx % warnaBar.length];
+        return `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-200 font-medium">${kat}</span>
+              <span class="text-slate-400">${formatRupiah(nom)} (${persen}%)</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div class="${warna} h-full rounded-full" style="width: ${persen}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderIndikatorSehat() {
+      const totalSaldo = state.dompet.reduce((a, b) => a + (Number(b.saldo) || 0), 0);
+      let masuk = 0;
+      let keluar = 0;
+      state.mutasi.forEach(m => {
+        if (m.tipe === 'MASUK') masuk += Number(m.nominal) || 0;
+        if (m.tipe === 'KELUAR') keluar += Number(m.nominal) || 0;
+      });
+      const rasioHemat = masuk > 0 ? Math.round(((masuk - keluar) / masuk) * 100) : 0;
+      const tagihanBelum = state.tagihan.filter(t => !t.lunas).length;
+
+      const lencana = document.getElementById('lencanaSkorSehat');
+      if (rasioHemat >= 20) {
+        lencana.textContent = 'Sangat Sehat (Skor 88/100)';
+        lencana.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold';
+      } else {
+        lencana.textContent = 'Perlu Dijaga (Skor 68/100)';
+        lencana.className = 'text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold';
+      }
+
+      document.getElementById('daftarIndikatorSehat').innerHTML = `
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+          <span>Rasio Penyisihan Tabungan</span>
+          <span class="font-bold text-emerald-400">${rasioHemat}% (Ideal &ge; 20%)</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+          <span>Tagihan Bulanan Belum Dibayar</span>
+          <span class="font-bold text-amber-300">${tagihanBelum} Jadwal</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
+          <span>Total Cadangan Kas Tersedia</span>
+          <span class="font-bold text-sky-300">${formatRupiah(totalSaldo)}</span>
+        </div>
+      `;
+    }
+
+    function buatKartuMutasiHtml(m) {
+      const apakahMasuk = m.tipe === 'MASUK';
+      const apakahTransfer = m.tipe === 'TRANSFER';
+      const warnaTeks = apakahMasuk ? 'text-emerald-400' : (apakahTransfer ? 'text-sky-400' : 'text-rose-400');
+      const tanda = apakahMasuk ? '+' : (apakahTransfer ? '⇄' : '-');
+      return `
+        <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-100 truncate">${m.catatan}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">${m.kategori}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5">${m.tanggal} • ${cariNamaDompet(m.dompetId)}</div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="text-xs sm:text-sm font-extrabold ${warnaTeks}">${tanda} ${formatRupiah(m.nominal)}</span>
+            <button type="button" data-hapus-mutasi="${m.id}" class="text-[11px] text-slate-500 hover:text-rose-400 px-1.5 py-1">Hapus</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMutasiTerbaru() {
+      const wadah = document.getElementById('wadahMutasiTerbaru');
+      const urut = [...state.mutasi].reverse().slice(0, 5);
+      wadah.innerHTML = urut.length ? urut.map(buatKartuMutasiHtml).join('') : '<p class="text-xs text-slate-500">Belum ada transaksi.</p>';
+    }
+
+    function renderMutasiLengkap() {
+      const kata = (document.getElementById('inputCariMutasi').value || '').toLowerCase();
+      const tipe = document.getElementById('pilihFilterTipe').value;
+      const dompet = document.getElementById('pilihFilterDompet').value;
+
+      const hasil = [...state.mutasi].reverse().filter(m => {
+        const cocokKata = !kata || m.catatan.toLowerCase().includes(kata) || m.kategori.toLowerCase().includes(kata);
+        const cocokTipe = tipe === 'SEMUA' || m.tipe === tipe;
+        const cocokDompet = dompet === 'SEMUA' || m.dompetId === dompet;
+        return cocokKata && cocokTipe && cocokDompet;
+      });
+
+      document.getElementById('infoHasilFilter').textContent = `Menampilkan ${hasil.length} dari ${state.mutasi.length} transaksi`;
+      document.getElementById('wadahDaftarMutasiLengkap').innerHTML =
+        hasil.length ? hasil.map(buatKartuMutasiHtml).join('') : '<p class="text-xs text-slate-500 py-4 text-center">Tidak ada transaksi yang cocok dengan pencarian.</p>';
+    }
+
+    function renderDaftarAnggaran() {
+      const wadah = document.getElementById('wadahDaftarAnggaran');
+      wadah.innerHTML = state.anggaran.map(a => {
+        const terpakai = state.mutasi
+          .filter(m => m.tipe === 'KELUAR' && m.kategori === a.kategori)
+          .reduce((acc, m) => acc + (Number(m.nominal) || 0), 0);
+        const persen = a.batas > 0 ? Math.min(100, Math.round((terpakai / a.batas) * 100)) : 0;
+        const warna = persen >= 90 ? 'bg-rose-500' : (persen >= 75 ? 'bg-amber-500' : 'bg-emerald-500');
+        return `
+          <div class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs text-white">${a.kategori}</span>
+              <span class="text-[11px] font-semibold text-slate-400">${persen}% terpakai</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+              <div class="${warna} h-full rounded-full" style="width: ${persen}%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>Terpakai: ${formatRupiah(terpakai)}</span>
+              <span>Batas: ${formatRupiah(a.batas)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDaftarImpian() {
+      const wadah = document.getElementById('wadahDaftarImpian');
+      wadah.innerHTML = state.impian.map(item => {
+        const persen = item.target > 0 ? Math.min(100, Math.round((item.terkumpul / item.target) * 100)) : 0;
+        const kurang = Math.max(0, item.target - item.terkumpul);
+        return `
+          <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-xs text-white">${item.judul}</h4>
+                <p class="text-[11px] text-slate-400">Target Tanggal: ${item.tenggat}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold text-xs">${persen}%</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+              <div class="bg-emerald-500 h-full rounded-full" style="width: ${persen}%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-300">
+              <span>Terkumpul: ${formatRupiah(item.terkumpul)}</span>
+              <span>Kurang: ${formatRupiah(kurang)}</span>
+            </div>
+            <div class="pt-1 flex gap-2">
+              <button type="button" data-tabung-impian="${item.id}" class="flex-1 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-semibold">
+                + Tambah Tabungan (+Rp 50rb)
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTagihanPinjaman() {
+      const wadahTagihan = document.getElementById('wadahDaftarTagihan');
+      wadahTagihan.innerHTML = state.tagihan.map(t => `
+        <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2">
+          <div>
+            <div class="text-xs font-bold text-white">${t.nama}</div>
+            <div class="text-[11px] text-slate-400">${t.jatuhTempo} • ${formatRupiah(t.nominal)}</div>
+          </div>
+          <button type="button" data-toggle-tagihan="${t.id}" class="px-2.5 py-1 rounded-xl text-xs font-bold ${t.lunas ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">
+            ${t.lunas ? 'Sudah Lunas' : 'Tandai Lunas'}
+          </button>
+        </div>
+      `).join('');
+
+      const wadahPinjaman = document.getElementById('wadahDaftarPinjaman');
+      wadahPinjaman.innerHTML = state.pinjaman.map(p => `
+        <div class="p-3 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${p.jenis === 'PIUTANG' ? 'bg-sky-500/20 text-sky-300' : 'bg-rose-500/20 text-rose-300'}">${p.jenis}</span>
+              <span class="text-xs font-bold text-white">${p.namaOrang}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Tenggat ${p.tenggat} • ${formatRupiah(p.nominal)}</div>
+          </div>
+          <button type="button" data-toggle-pinjaman="${p.id}" class="px-2.5 py-1 rounded-xl text-xs font-bold ${p.selesai ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-300'}">
+            ${p.selesai ? 'Selesai' : 'Lunasi'}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function hitungSimulasiKeuangan() {
+      const gaji = Number(document.getElementById('inputGajiSimulasi').value) || 0;
+      const pokok = Number(document.getElementById('inputPokokSimulasi').value) || 0;
+      const bulan = Number(document.getElementById('inputBulanDarurat').value) || 6;
+
+      const porsiKebutuhan = Math.round(gaji * 0.5);
+      const porsiKeinginan = Math.round(gaji * 0.3);
+      const porsiTabungan = Math.round(gaji * 0.2);
+      const targetDarurat = pokok * bulan;
+      const lamaKumpul = porsiTabungan > 0 ? Math.ceil(targetDarurat / porsiTabungan) : 0;
+
+      document.getElementById('hasilKotakSimulasi').innerHTML = `
+        <h4 class="font-bold text-sm text-white">Hasil Rekomendasi Alokasi Bulanan</h4>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block">50% Kebutuhan</span>
+            <strong class="text-emerald-300 text-xs">${formatRupiah(porsiKebutuhan)}</strong>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block">30% Gaya Hidup</span>
+            <strong class="text-sky-300 text-xs">${formatRupiah(porsiKeinginan)}</strong>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
+            <span class="text-[10px] text-slate-400 block">20% Tabungan</span>
+            <strong class="text-amber-300 text-xs">${formatRupiah(porsiTabungan)}</strong>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 space-y-1">
+          <div class="font-bold text-emerald-300">Target Dana Darurat Ideal (${bulan}x Pengeluaran Pokok):</div>
+          <div class="text-base font-extrabold text-white">${formatRupiah(targetDarurat)}</div>
+          <p class="text-[11px] text-slate-300">Dengan menyisihkan 20% (${formatRupiah(porsiTabungan)}/bulan), target dana darurat tercapai dalam sekitar <strong>${lamaKumpul} bulan</strong>.</p>
+        </div>
+      `;
+    }
+
+    function isiPilihanFormTransaksi(tipe) {
+      document.getElementById('nilaiTipeTransaksi').value = tipe;
+      const btnKeluar = document.getElementById('pilihTipeKeluar');
+      const btnMasuk = document.getElementById('pilihTipeMasuk');
+      if (tipe === 'KELUAR') {
+        btnKeluar.className = 'py-2 rounded-xl font-bold bg-rose-600 text-white';
+        btnMasuk.className = 'py-2 rounded-xl font-bold bg-slate-800 text-slate-300';
+      } else {
+        btnMasuk.className = 'py-2 rounded-xl font-bold bg-emerald-600 text-white';
+        btnKeluar.className = 'py-2 rounded-xl font-bold bg-slate-800 text-slate-300';
+      }
+      const daftarKat = tipe === 'KELUAR' ? KATEGORI_KELUAR : KATEGORI_MASUK;
+      document.getElementById('inputKategoriTransaksi').innerHTML =
+        daftarKat.map(k => `<option value="${k}">${k}</option>`).join('');
+      document.getElementById('inputDompetTransaksi').innerHTML =
+        state.dompet.map(d => `<option value="${d.id}">${d.nama} (${formatRupiah(d.saldo)})</option>`).join('');
+      document.getElementById('inputTanggalTransaksi').value = new Date().toISOString().slice(0, 10);
+    }
+
+    function bukaModalUniversal(judul, htmlIsi, saatPasang) {
+      document.getElementById('judulModalUniversal').textContent = judul;
+      document.getElementById('isiModalUniversal').innerHTML = htmlIsi;
+      document.getElementById('modalUniversal').classList.remove('hidden');
+      if (typeof saatPasang === 'function') saatPasang();
+    }
+
+    function tutupModalUniversal() {
+      document.getElementById('modalUniversal').classList.add('hidden');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSemua();
+
+      document.querySelectorAll('.tombol-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = btn.getAttribute('data-panel');
+          ['ringkasan', 'mutasi', 'anggaran', 'impian', 'tagihan', 'simulasi'].forEach(nama => {
+            const el = document.getElementById('panel-' + nama);
+            if (el) el.classList.toggle('hidden', nama !== target);
+          });
+          document.querySelectorAll('.tombol-tab').forEach(b => {
+            const aktif = b.getAttribute('data-panel') === target;
+            b.className = 'tombol-tab flex-1 py-2 px-3 rounded-xl text-xs font-bold whitespace-nowrap ' +
+              (aktif ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white');
+          });
+        });
+      });
+
+      document.getElementById('btnLihatSemuaMutasi').addEventListener('click', () => {
+        const tabMutasi = document.querySelector('[data-panel="mutasi"]');
+        if (tabMutasi) tabMutasi.click();
+      });
+
+      document.getElementById('btnSembunyiSaldo').addEventListener('click', () => {
+        state.sembunyiSaldo = !state.sembunyiSaldo;
+        renderSemua();
+        tampilToast(state.sembunyiSaldo ? 'Mode privasi saldo diaktifkan' : 'Nominal saldo ditampilkan kembali');
+      });
+
+      document.getElementById('btnBukaModalTransaksi').addEventListener('click', () => {
+        isiPilihanFormTransaksi('KELUAR');
+        document.getElementById('modalTransaksi').classList.remove('hidden');
+      });
+
+      document.getElementById('btnTutupModalTransaksi').addEventListener('click', () => {
+        document.getElementById('modalTransaksi').classList.add('hidden');
+      });
+
+      document.getElementById('pilihTipeKeluar').addEventListener('click', () => isiPilihanFormTransaksi('KELUAR'));
+      document.getElementById('pilihTipeMasuk').addEventListener('click', () => isiPilihanFormTransaksi('MASUK'));
+
+      document.getElementById('formTransaksi').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const tipe = document.getElementById('nilaiTipeTransaksi').value;
+        const nominal = Number(document.getElementById('inputNominalTransaksi').value) || 0;
+        const kategori = document.getElementById('inputKategoriTransaksi').value;
+        const dompetId = document.getElementById('inputDompetTransaksi').value;
+        const tanggal = document.getElementById('inputTanggalTransaksi').value;
+        const catatan = document.getElementById('inputCatatanTransaksi').value.trim();
+
+        if (nominal <= 0 || !catatan) return;
+        const dompet = state.dompet.find(d => d.id === dompetId);
+        if (dompet) {
+          dompet.saldo += (tipe === 'MASUK' ? nominal : -nominal);
+        }
+        state.mutasi.push({
+          id: 'm' + Date.now(),
+          tipe,
+          nominal,
+          kategori,
+          dompetId,
+          tanggal,
+          catatan
+        });
+        document.getElementById('formTransaksi').reset();
+        document.getElementById('modalTransaksi').classList.add('hidden');
+        renderSemua();
+        tampilToast('Transaksi berhasil disimpan');
+      });
+
+      document.getElementById('btnBukaModalTransfer').addEventListener('click', () => {
+        const opsi = state.dompet.map(d => `<option value="${d.id}">${d.nama} (${formatRupiah(d.saldo)})</option>`).join('');
+        document.getElementById('inputDompetAsal').innerHTML = opsi;
+        document.getElementById('inputDompetTujuan').innerHTML = opsi;
+        if (state.dompet.length > 1) document.getElementById('inputDompetTujuan').value = state.dompet[1].id;
+        document.getElementById('modalTransfer').classList.remove('hidden');
+      });
+
+      document.getElementById('btnTutupModalTransfer').addEventListener('click', () => {
+        document.getElementById('modalTransfer').classList.add('hidden');
+      });
+
+      document.getElementById('formTransfer').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const asalId = document.getElementById('inputDompetAsal').value;
+        const tujuanId = document.getElementById('inputDompetTujuan').value;
+        const nominal = Number(document.getElementById('inputNominalTransfer').value) || 0;
+        const ket = document.getElementById('inputCatatanTransfer').value.trim() || 'Pindah dana antar dompet';
+
+        if (asalId === tujuanId) {
+          tampilToast('Pilih dompet tujuan yang berbeda');
+          return;
+        }
+        const dAsal = state.dompet.find(d => d.id === asalId);
+        const dTujuan = state.dompet.find(d => d.id === tujuanId);
+        if (dAsal && dTujuan && nominal > 0) {
+          dAsal.saldo -= nominal;
+          dTujuan.saldo += nominal;
+          state.mutasi.push({
+            id: 'm' + Date.now(),
+            tipe: 'TRANSFER',
+            nominal,
+            kategori: 'Pindah Dana',
+            dompetId: asalId,
+            tanggal: new Date().toISOString().slice(0, 10),
+            catatan: `${ket} (ke ${dTujuan.nama})`
+          });
+          document.getElementById('formTransfer').reset();
+          document.getElementById('modalTransfer').classList.add('hidden');
+          renderSemua();
+          tampilToast('Pindah dana berhasil dicatat');
+        }
+      });
+
+      document.getElementById('btnTutupModalUniversal').addEventListener('click', tutupModalUniversal);
+
+      document.getElementById('btnTambahDompetBaru').addEventListener('click', () => {
+        bukaModalUniversal('Tambah Dompet / Rekening Baru', `
+          <form id="formDompetBaru" class="space-y-3">
+            <input id="namaDompetBaru" type="text" required placeholder="Nama Dompet (mis. SeaBank / GoPay)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <select id="jenisDompetBaru" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+              <option value="Bank">Rekening Bank</option>
+              <option value="Digital">E-Wallet Digital</option>
+              <option value="Tunai">Uang Tunai</option>
+              <option value="Investasi">Tabungan / Investasi</option>
+            </select>
+            <input id="saldoDompetBaru" type="number" required min="0" placeholder="Saldo Awal (Rp)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <button type="submit" class="w-full py-2 rounded-xl bg-emerald-600 text-white font-bold">Tambah Dompet</button>
+          </form>
+        `, () => {
+          document.getElementById('formDompetBaru').addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            state.dompet.push({
+              id: 'd' + (state.dompet.length + 1),
+              nama: document.getElementById('namaDompetBaru').value.trim(),
+              jenis: document.getElementById('jenisDompetBaru').value,
+              saldo: Number(document.getElementById('saldoDompetBaru').value) || 0
+            });
+            tutupModalUniversal();
+            renderSemua();
+            tampilToast('Dompet baru berhasil ditambahkan');
+          });
+        });
+      });
+
+      document.getElementById('btnBukaModalAnggaran').addEventListener('click', () => {
+        const opsi = KATEGORI_KELUAR.map(k => `<option value="${k}">${k}</option>`).join('');
+        bukaModalUniversal('Atur Batas Anggaran Bulanan', `
+          <form id="formAnggaranBaru" class="space-y-3">
+            <select id="katAnggaranBaru" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">${opsi}</select>
+            <input id="batasAnggaranBaru" type="number" required min="10000" placeholder="Batas Maksimal Bulanan (Rp)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <button type="submit" class="w-full py-2 rounded-xl bg-emerald-600 text-white font-bold">Simpan Anggaran</button>
+          </form>
+        `, () => {
+          document.getElementById('formAnggaranBaru').addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            const kat = document.getElementById('katAnggaranBaru').value;
+            const batas = Number(document.getElementById('batasAnggaranBaru').value) || 0;
+            const ada = state.anggaran.find(a => a.kategori === kat);
+            if (ada) ada.batas = batas;
+            else state.anggaran.push({ kategori: kat, batas });
+            tutupModalUniversal();
+            renderSemua();
+            tampilToast('Batas anggaran diperbarui');
+          });
+        });
+      });
+
+      document.getElementById('btnBukaModalImpian').addEventListener('click', () => {
+        bukaModalUniversal('Buat Target Tabungan Impian', `
+          <form id="formImpianBaru" class="space-y-3">
+            <input id="judulImpianBaru" type="text" required placeholder="Nama Target (mis. Beli Laptop / Sepatu)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input id="targetImpianBaru" type="number" required min="50000" placeholder="Target Dana (Rp)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input id="awalImpianBaru" type="number" value="0" min="0" placeholder="Dana Terkumpul Saat Ini (Rp)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input id="tenggatImpianBaru" type="date" required value="2027-06-01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <button type="submit" class="w-full py-2 rounded-xl bg-emerald-600 text-white font-bold">Simpan Target</button>
+          </form>
+        `, () => {
+          document.getElementById('formImpianBaru').addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            state.impian.push({
+              id: 'i' + Date.now(),
+              judul: document.getElementById('judulImpianBaru').value.trim(),
+              target: Number(document.getElementById('targetImpianBaru').value) || 0,
+              terkumpul: Number(document.getElementById('awalImpianBaru').value) || 0,
+              tenggat: document.getElementById('tenggatImpianBaru').value
+            });
+            tutupModalUniversal();
+            renderSemua();
+            tampilToast('Target tabungan ditambahkan');
+          });
+        });
+      });
+
+      document.getElementById('btnBukaModalTagihan').addEventListener('click', () => {
+        bukaModalUniversal('Tambah Jadwal Tagihan Rutin', `
+          <form id="formTagihanBaru" class="space-y-3">
+            <input id="namaTagihanBaru" type="text" required placeholder="Nama Tagihan (mis. WiFi / Listrik)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input id="nomTagihanBaru" type="number" required min="5000" placeholder="Nominal Tagihan (Rp)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input id="tempoTagihanBaru" type="text" required placeholder="Jadwal (mis. Tanggal 15)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <button type="submit" class="w-full py-2 rounded-xl bg-emerald-600 text-white font-bold">Simpan Tagihan</button>
+          </form>
+        `, () => {
+          document.getElementById('formTagihanBaru').addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            state.tagihan.push({
+              id: 't' + Date.now(),
+              nama: document.getElementById('namaTagihanBaru').value.trim(),
+              nominal: Number(document.getElementById('nomTagihanBaru').value) || 0,
+              jatuhTempo: document.getElementById('tempoTagihanBaru').value.trim(),
+              lunas: false
+            });
+            tutupModalUniversal();
+            renderSemua();
+            tampilToast('Jadwal tagihan disimpan');
+          });
+        });
+      });
+
+      document.getElementById('btnBukaModalPinjaman').addEventListener('click', () => {
+        bukaModalUniversal('Catat Pinjaman / Piutang', `
+          <form id="formPinjamanBaru" class="space-y-3">
+            <select id="jenisPinjamanBaru" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+              <option value="PIUTANG">Piutang (Teman Pinjam ke Kita)</option>
+              <option value="HUTANG">Hutang (Kita Pinjam)</option>
+            </select>
+            <input id="orangPinjamanBaru" type="text" required placeholder="Nama Orang / Keterangan" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input id="nomPinjamanBaru" type="number" required min="1000" placeholder="Nominal (Rp)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <input id="tenggatPinjamanBaru" type="date" required value="2026-12-01" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white">
+            <button type="submit" class="w-full py-2 rounded-xl bg-emerald-600 text-white font-bold">Simpan Catatan</button>
+          </form>
+        `, () => {
+          document.getElementById('formPinjamanBaru').addEventListener('submit', (ev) => {
+            ev.preventDefault();
+            state.pinjaman.push({
+              id: 'p' + Date.now(),
+              jenis: document.getElementById('jenisPinjamanBaru').value,
+              namaOrang: document.getElementById('orangPinjamanBaru').value.trim(),
+              nominal: Number(document.getElementById('nomPinjamanBaru').value) || 0,
+              tenggat: document.getElementById('tenggatPinjamanBaru').value,
+              selesai: false
+            });
+            tutupModalUniversal();
+            renderSemua();
+            tampilToast('Catatan pinjaman ditambahkan');
+          });
+        });
+      });
+
+      document.getElementById('btnPasangHp').addEventListener('click', () => {
+        bukaModalUniversal('Cara Pasang Aplikasi di HP (Redmi / Android & iOS)', `
+          <div class="space-y-2.5 text-slate-300 leading-relaxed">
+            <p class="font-semibold text-emerald-300">Aplikasi ini mendukung pemasangan langsung ke layar utama HP tanpa perlu Play Store (Berjalan 100% Offline):</p>
+            <ol class="list-decimal list-inside space-y-1.5">
+              <li>Unduh file <strong>dompetku.html</strong> atau buka tautan GitHub Pages aplikasi ini di <strong>Google Chrome</strong> pada HP Anda.</li>
+              <li>Ketuk ikon menu <strong>Titik Tiga (⋮)</strong> di pojok kanan atas browser Chrome.</li>
+              <li>Pilih menu <strong>"Tambahkan ke layar utama" (Add to Home screen)</strong> atau <strong>"Instal aplikasi"</strong>.</li>
+              <li>Ikon <strong>DompetKu Pro</strong> akan muncul di layar HP Anda dan siap dibuka penuh layar kapan saja tanpa kuota internet.</li>
+            </ol>
+          </div>
+        `);
+      });
+
+      document.getElementById('btnDataCadangan').addEventListener('click', () => {
+        bukaModalUniversal('Cadangkan & Pulihkan Data Keuangan (JSON)', `
+          <div class="space-y-3">
+            <p class="text-slate-400">Simpan cadangan data keuangan ke memori HP atau pulihkan dari file cadangan sebelumnya.</p>
+            <button id="btnEksporJson" type="button" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold">Unduh File Cadangan (.json)</button>
+            <button id="btnResetAwal" type="button" class="w-full py-2 rounded-xl bg-rose-950/60 text-rose-300 border border-rose-500/30 font-semibold">Reset ke Data Contoh Awal</button>
+          </div>
+        `, () => {
+          document.getElementById('btnEksporJson').addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cadangan-dompetku-pro.json';
+            a.click();
+            tampilToast('File cadangan JSON berhasil diunduh');
+          });
+          document.getElementById('btnResetAwal').addEventListener('click', () => {
+            state = JSON.parse(JSON.stringify(DATA_AWAL));
+            tutupModalUniversal();
+            renderSemua();
+            tampilToast('Data dikembalikan ke pengaturan awal');
+          });
+        });
+      });
+
+      document.getElementById('inputCariMutasi').addEventListener('input', renderMutasiLengkap);
+      document.getElementById('pilihFilterTipe').addEventListener('change', renderMutasiLengkap);
+      document.getElementById('pilihFilterDompet').addEventListener('change', renderMutasiLengkap);
+
+      document.getElementById('btnUnduhCsv').addEventListener('click', () => {
+        const baris = [['Tanggal', 'Tipe', 'Kategori', 'Dompet', 'Nominal', 'Catatan']];
+        state.mutasi.forEach(m => {
+          baris.push([m.tanggal, m.tipe, m.kategori, cariNamaDompet(m.dompetId), m.nominal, `"${m.catatan}"`]);
+        });
+        const csv = baris.map(r => r.join(',')).join('\n');
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'laporan-keuangan-dompetku.csv';
+        a.click();
+        tampilToast('Laporan CSV berhasil diunduh');
+      });
+
+      document.getElementById('btnHitungSimulasi').addEventListener('click', () => {
+        hitungSimulasiKeuangan();
+        tampilToast('Simulasi alokasi diperbarui');
+      });
+
+      document.body.addEventListener('click', (e) => {
+        const hapusId = e.target.getAttribute('data-hapus-mutasi');
+        if (hapusId) {
+          const idx = state.mutasi.findIndex(m => m.id === hapusId);
+          if (idx !== -1) {
+            const item = state.mutasi[idx];
+            const d = state.dompet.find(dom => dom.id === item.dompetId);
+            if (d && item.tipe !== 'TRANSFER') {
+              d.saldo += (item.tipe === 'MASUK' ? -item.nominal : item.nominal);
+            }
+            state.mutasi.splice(idx, 1);
+            renderSemua();
+            tampilToast('Transaksi dihapus');
+          }
+        }
+
+        const impianId = e.target.getAttribute('data-tabung-impian');
+        if (impianId) {
+          const imp = state.impian.find(i => i.id === impianId);
+          if (imp) {
+            imp.terkumpul = Math.min(imp.target, imp.terkumpul + 50000);
+            renderSemua();
+            tampilToast('Tabungan impian +Rp 50.000 tercatat');
+          }
+        }
+
+        const tagihanId = e.target.getAttribute('data-toggle-tagihan');
+        if (tagihanId) {
+          const tag = state.tagihan.find(t => t.id === tagihanId);
+          if (tag) {
+            tag.lunas = !tag.lunas;
+            renderSemua();
+            tampilToast('Status tagihan diperbarui');
+          }
+        }
+
+        const pinjamId = e.target.getAttribute('data-toggle-pinjaman');
+        if (pinjamId) {
+          const pin = state.pinjaman.find(p => p.id === pinjamId);
+          if (pin) {
+            pin.selesai = !pin.selesai;
+            renderSemua();
+            tampilToast('Status pinjaman diperbarui');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
